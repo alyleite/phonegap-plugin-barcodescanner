@@ -41,6 +41,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String CANCELLED = "cancelled";
     private static final String FORMAT = "format";
     private static final String EXTENSION = "extension";
+    private static final String EXTENSIONS = "extensions";
     private static final String TEXT = "text";
     private static final String DATA = "data";
     private static final String TYPE = "type";
@@ -139,9 +140,6 @@ public class BarcodeScanner extends CordovaPlugin {
                 Intent intentScan = new Intent(that.cordova.getActivity().getBaseContext(), CaptureActivity.class);
                 intentScan.setAction(Intents.Scan.ACTION);
                 intentScan.addCategory(Intent.CATEGORY_DEFAULT);
-                // length extensions
-                intentScan.putExtra("ALLOWED_EAN_EXTENSIONS", new int[] {5});
-
                 // add config as intent extras
                 if (args.length() > 0) {
 
@@ -191,6 +189,19 @@ public class BarcodeScanner extends CordovaPlugin {
                         }
                         if (obj.has(ORIENTATION)) {
                             intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(ORIENTATION));
+                        }
+                        if (obj.has(EXTENSIONS)) {
+                            String listExtension[] = obj.optString(EXTENSIONS).replaceAll(",", ";").split(";");
+                            int[] allowedExtensions = new int[listExtension.length];
+                            if(listExtension.length > 0){
+                                for (int x = 0; x < listExtension.length; x++){
+                                    String ext = listExtension[x];
+                                    if(ext != null && !ext.isEmpty()){
+                                        allowedExtensions[x] = Integer.parseInt(ext);
+                                    }
+                                }
+                                intentScan.putExtra("ALLOWED_EAN_EXTENSIONS", allowedExtensions);
+                            }
                         }
                     }
 
